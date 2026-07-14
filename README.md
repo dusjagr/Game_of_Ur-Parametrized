@@ -65,13 +65,22 @@ This model is designed to be easily customized without touching any code by usin
 
 The Royal Game of Ur is an ancient Mesopotamian board game played from the early third millennium BC (c. 2600-2400 BC). It is a two-player race game played with sets of seven markers and four tetrahedral dice. The game was famously rediscovered by English archaeologist Sir Leonard Woolley during his excavations of the Royal Cemetery at Ur between 1922 and 1934, making it one of the oldest known board games in human history. 
 
+For millennia, the exact rules of the game were lost. This changed when Dr. Irving Finkel, an Assyriologist and curator at the British Museum, successfully translated a cuneiform clay tablet (the ITI tablet) dating back to 177-176 BC. By deciphering the ancient cuneiform script, Finkel reconstructed the path of the pieces and the rules of engagement, resurrecting a playable game from the ancient world. 
+
+Watch an iconic and highly entertaining demonstration of the rules in action as [Dr. Finkel plays against Tom Scott on YouTube](https://www.youtube.com/watch?v=WZskjLq040I).
+
 Read more: [Wikipedia: Royal Game of Ur](https://en.wikipedia.org/wiki/Royal_Game_of_Ur)
+- View the original artifact: [The British Museum Collection](https://www.britishmuseum.org/collection/object/W_1928-1009-378)
+- Transliteration of the rules tablet (BM.33333.B): [Electronic Babylonian Library](https://www.ebl.lmu.de/library/BM.33333.B)
 
 ## Acknowledgements & Credits
 
 The structural design was inspired by and adapted from:
 - [Thingiverse: Laser Cut Royal Game of Ur](https://www.thingiverse.com/thing:2809371) (by DonaldSayers). 
 - The top surface geometric pattern is also heavily inspired by this project.
+- The printable rules summary can be engraved in the drawer, based on designs by [captchemo on Thingiverse](https://www.thingiverse.com/captchemo/designs).
+
+![Rules Tablet Comparison](img/rules_old_new.jpg)
 
 ## AI Agentic Coding & Development Process
 
