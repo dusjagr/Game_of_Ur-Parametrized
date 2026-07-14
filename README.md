@@ -85,4 +85,4 @@ This codebase was developed iteratively from scratch through rapid pair-programm
 - **Estimated AI Compute Usage**: ~400,000 Input Tokens, ~25,000 Output Tokens.
 
 ## License
-MIT License
+This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) License.
