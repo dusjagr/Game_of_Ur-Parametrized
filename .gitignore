@@ -1,0 +1,16 @@
+# OpenSCAD Backup and Cache
+*.scad~
+*.deps
+
+# 3D Renders and Intermediate Files
+*.amf
+*.3mf
+
+# Temporary and Scratch Directories
+test-tmp/
+scratch/
+.system_generated/
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
