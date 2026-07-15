@@ -2,10 +2,11 @@
 // Render with View -> Animate (Time: 0 to 1, FPS: 30, Steps: 200)
 
 // Include all modules and variables from the main box logic
-include <ur_laser_box.scad>
+include <../ur_laser_box.scad>
 
 // Suppress the static output of the main file
 output_mode = "ANIMATION";
+asset_path = "../";
 include_drawer = false;
 include_dice = false;
 include_pieces = false;

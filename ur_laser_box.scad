@@ -122,6 +122,7 @@ wall_11_pattern = "SEES";
 wall_12_pattern = "S0S"; 
 
 /* [Hidden] */
+asset_path = "";
 
 // Pattern definitions for the 12 walls
 wall_patterns = [
@@ -204,7 +205,7 @@ module engraving_layer() {
   translate([-border_width + 1.5, -border_width + 1.5])
     scale([scale_x, scale_y])
       translate([-svg_orig_x, -svg_orig_y])
-        import("Ur_engraving_clean.svg");
+        import(str(asset_path, "Ur_engraving_clean.svg"));
 }
 
 // Drawer sub-components
@@ -283,7 +284,7 @@ module drawer_engraving(w, h) {
   // Center the engraving on the plate
   translate([(w - actual_w) / 2, (h - actual_h) / 2])
     scale([scale_factor, scale_factor])
-      import("rules_tablet.svg");
+      import(str(asset_path, "rules_tablet.svg"));
 }
 
 module drawer_parts(mode = "2D") {
