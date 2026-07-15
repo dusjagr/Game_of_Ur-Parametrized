@@ -2,7 +2,7 @@
 
 A highly configurable, fully parametric OpenSCAD model of the Royal Game of Ur for laser cutting and 3D printing.
 
-![Assembly Preview](ur_animation.gif)
+![Assembly Preview](animation/ur_animation.gif)
 
 
 ## Overview
@@ -72,6 +72,7 @@ Watch an iconic and highly entertaining demonstration of the rules in action as 
 Read more: [Wikipedia: Royal Game of Ur](https://en.wikipedia.org/wiki/Royal_Game_of_Ur)
 - View the original artifact: [The British Museum Collection](https://www.britishmuseum.org/collection/object/W_1928-1009-378)
 - Transliteration of the rules tablet (BM.33333.B): [Electronic Babylonian Library](https://www.ebl.lmu.de/library/BM.33333.B)
+- Lecture by Dr. Irving Finkel: [India and the Beauty of Boardgames](https://www.lockdownuniversity.org/lectures/1584-india-and-the-beauty-of-boardgames)
 
 ## Acknowledgements & Credits
 
