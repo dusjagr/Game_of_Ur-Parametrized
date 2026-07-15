@@ -26,12 +26,12 @@
 // finger joints (handling both convex and concave geometry), boolean-subtracted a sliding drawer,
 // and implemented dedicated 2D output modes for cuts vs. negative/positive space engravings.
 //
-// Estimated AI Compute Usage: ~400,000 Input Tokens, ~25,000 Output Tokens
-// Estimated API Cost: ~$0.15 - $0.30 USD
+// Estimated AI Compute Usage: ~950,000 Input Tokens, ~45,000 Output Tokens
+// Estimated API Cost: ~$0.45 - $0.65 USD
 
 /* [Output Selection] */
 // Select what you want to generate
-output_mode = "3D"; // ["3D":"3D Assembly Preview", "2D":"2D Laser Cut Layout", "2D_ENGRAVE":"2D Engraving Layout", "DICE":"3D Printable Dice", "PIECE":"3D Printable Piece"]
+output_mode = "3D"; // ["3D":"3D Assembly Preview", "2D":"2D Laser Cut Layout", "2D_ENGRAVE":"2D Engraving Layout", "DICE":"3D Printable Dice", "DICE_TIPS":"3D Printable Dice Tips", "PIECE":"3D Printable Piece"]
 
 /* [Box Dimensions] */
 // Thickness of your material (e.g. plywood/acrylic)
@@ -52,25 +52,30 @@ inner_extra_width = board_length * (1.4 / 267);
 
 /* [Box Options] */
 // If true, top plate has no finger joints and is glued flush
-flush_top_plate = true; 
+flush_top_plate = true;
 
 /* [Engraving Options] */
 // Generate geometric engraving patterns on the side walls
-include_side_engravings = true; 
+include_side_engravings = true;
 // Engrave the rules tablet on the inside of the drawer base plate
-include_drawer_engraving = false; 
+include_drawer_engraving = false;
 
 /* [Drawer Options] */
 // Add an optional slide-out drawer
-include_drawer = true; 
+include_drawer = true;
 // How far the drawer is pulled out in 3D preview
 drawer_pull_out = 150; // [0:1:250]
 // Gap around the drawer so it slides smoothly
 drawer_clearance = 0.5; // [0:0.1:2.0]
+// Diameter of the finger pull hole in the front plate
+drawer_hole_diameter = 16; // [10:1:40]
 
 /* [Dice Options] */
 // Show 3D printed tetrahedron dice in the assembly preview
-include_dice = true; 
+include_dice = true;
+dice_style = "CUT_TIPS"; // ["STANDARD": "Standard (Recessed Marks)", "CUT_TIPS": "Cut Tips (For Multi-Color Gluing)"]
+// How much of the tip to slice off (in mm) if using CUT_TIPS
+dice_tip_cut_depth = 5.0; // [1.0:0.1:15.0]
 // Standard Game of Ur uses 4 dice per player (8 total)
 num_dice = 4; // [0:1:8]
 // Edge length of the tetrahedron dice
@@ -81,10 +86,11 @@ dice_corner_radius = 1.2; // [0:0.1:5.0]
 dice_mark_pos = 0.65; // [0:0.05:1.0]
 // Size of the triangular marking relative to the dice edge
 dice_mark_size = 0.16; // [0.05:0.01:0.3]
+// Style of the dice tips (standard recessed marks, or cut tips for gluing)
 
 /* [Piece Options] */
 // Show play pieces in the assembly preview
-include_pieces = true; 
+include_pieces = true;
 // Style of play pieces
 piece_type = "LASER"; // ["3D":"3D Rounded Printable", "LASER":"Flat Laser-Cut"]
 // Ratio of piece diameter to board square size
@@ -97,29 +103,29 @@ num_pieces = 14; // [0:1:14]
 /* [Wall Engraving Patterns] */
 // E = Eye, S = Stripes, T = Triangles, 0 = Blank. Length should match the wall's grid length.
 // Wall 1: Top-Left (Length 4)
-wall_1_pattern = "SEES"; 
+wall_1_pattern = "SEES";
 // Wall 2: Top-Right of Left Block (Length 1)
-wall_2_pattern = "S"; 
+wall_2_pattern = "S";
 // Wall 3: Inner Top-Left / Bridge (Length 2)
-wall_3_pattern = "EE"; 
+wall_3_pattern = "EE";
 // Wall 4: Inner Top-Right (Length 1)
-wall_4_pattern = "T"; 
+wall_4_pattern = "T";
 // Wall 5: Top-Left of Right Block (Length 2)
-wall_5_pattern = "ET"; 
+wall_5_pattern = "ET";
 // Wall 6: Top-Right Edge (Length 3)
-wall_6_pattern = "TTT"; 
+wall_6_pattern = "TTT";
 // Wall 7: Bottom-Right Edge (Length 2)
-wall_7_pattern = "TE"; 
+wall_7_pattern = "TE";
 // Wall 8: Bottom-Left of Right Block (Length 1)
-wall_8_pattern = "T"; 
+wall_8_pattern = "T";
 // Wall 9: Inner Bottom-Right / Bridge (Length 2)
-wall_9_pattern = "EE"; 
+wall_9_pattern = "EE";
 // Wall 10: Inner Bottom-Left (Length 1)
-wall_10_pattern = "S"; 
+wall_10_pattern = "S";
 // Wall 11: Bottom-Right of Left Block (Length 4)
-wall_11_pattern = "SEES"; 
+wall_11_pattern = "SEES";
 // Wall 12: Drawer Front (Length 3)
-wall_12_pattern = "S0S"; 
+wall_12_pattern = "S0S";
 
 /* [Hidden] */
 asset_path = "";
@@ -137,7 +143,7 @@ wall_patterns = [
   wall_9_pattern,
   wall_10_pattern,
   wall_11_pattern,
-  wall_12_pattern
+  wall_12_pattern,
 ];
 
 // Derived dimensions to guarantee perfect squares (8:3 tile ratio)
@@ -266,21 +272,21 @@ module drawer_front_plate(dw, dh) {
     // Right wall slots (at X=dw+t)
     for (i = [1:2:ny_odd - 1]) translate([dw + t, i * ty]) square([t, ty]);
 
-    // Finger hole
-    translate([front_w / 2, front_h - 12]) circle(d=12, $fn=32);
+    // Finger hole (centered above the bottom material thickness)
+    translate([front_w / 2, (front_h + t) / 2]) circle(d=drawer_hole_diameter, $fn=32);
   }
 }
 
 module drawer_engraving(w, h) {
   svg_w = 126.61512;
   svg_h = 189.43352;
-  
+
   // Calculate scale to fit inside the drawer base with a 3mm margin
   scale_factor = min((w - 6) / svg_w, (h - 6) / svg_h);
-  
+
   actual_w = svg_w * scale_factor;
   actual_h = svg_h * scale_factor;
-  
+
   // Center the engraving on the plate
   translate([(w - actual_w) / 2, (h - actual_h) / 2])
     scale([scale_factor, scale_factor])
@@ -312,11 +318,10 @@ module drawer_parts(mode = "2D") {
     if (include_drawer_engraving) {
       drawer_engraving(dw, dd);
     }
-    
+
     // Front Engraving
     translate([0, dd + dh + 2 * spacing]) {
-      translate([-t, 0])
-        sidewall_engraving(dw + 2 * t, box_height, wall_patterns[11]);
+      sidewall_engraving(dw + 2 * t, box_height, wall_patterns[11]);
     }
   }
 }
@@ -330,11 +335,11 @@ module drawer_3d() {
   color("peru") {
     linear_extrude(height=t) drawer_plate(dw, dd, -1, 1, 1, 1);
   }
-  
+
   // 3D Preview of the Rules Engraving on the inside bottom of the drawer
   if (include_drawer_engraving) {
     color("darkred") translate([0, 0, t - 0.01]) linear_extrude(height=0.51)
-      drawer_engraving(dw, dd);
+          drawer_engraving(dw, dd);
   }
 
   color("sandybrown") translate([0, dd, 0]) rotate([90, 0, 0]) linear_extrude(height=t)
@@ -516,7 +521,7 @@ module side_walls_layout(mode = "2D") {
 }
 
 // Parametric Rounded Tetrahedron for Dice
-module rounded_tetrahedron(edge_length = 50, corner_radius = 5, mark_pos = 0.75, mark_size = 0.12, center = false) {
+module rounded_tetrahedron(edge_length = 50, corner_radius = 5, mark_pos = 0.75, mark_size = 0.12, center = false, render_full = false) {
   // Constrain corner radius to prevent negative lengths
   r = max(0.001, min(corner_radius, edge_length / 2 - 0.001));
 
@@ -550,16 +555,79 @@ module rounded_tetrahedron(edge_length = 50, corner_radius = 5, mark_pos = 0.75,
       p2 = [-e / (2 * sqrt(3)), -e / 2, 0];
       p3 = [0, 0, h];
 
-      // Mark 3 faces around Top Vertex (p3)
-      corner_mark(p0, p3, p1, p2, h, r, edge_length, mark_pos, mark_size);
-      corner_mark(p1, p3, p2, p0, h, r, edge_length, mark_pos, mark_size);
-      corner_mark(p2, p3, p0, p1, h, r, edge_length, mark_pos, mark_size);
+      if (dice_style == "CUT_TIPS" && !render_full) {
+        // Cut the tips off completely
+        dice_cut_mask(edge_length, r, dice_tip_cut_depth);
+      } else {
+        // STANDARD: Mark 3 faces around Top Vertex (p3)
+        corner_mark(p0, p3, p1, p2, h, r, edge_length, mark_pos, mark_size);
+        corner_mark(p1, p3, p2, p0, h, r, edge_length, mark_pos, mark_size);
+        corner_mark(p2, p3, p0, p1, h, r, edge_length, mark_pos, mark_size);
 
-      // Mark 3 faces around Base Vertex 0 (p0)
-      corner_mark(p1, p0, p3, p2, h, r, edge_length, mark_pos, mark_size);
-      corner_mark(p2, p0, p1, p3, h, r, edge_length, mark_pos, mark_size);
-      corner_mark(p3, p0, p2, p1, h, r, edge_length, mark_pos, mark_size);
+        // STANDARD: Mark 3 faces around Base Vertex 0 (p0)
+        corner_mark(p1, p0, p3, p2, h, r, edge_length, mark_pos, mark_size);
+        corner_mark(p2, p0, p1, p3, h, r, edge_length, mark_pos, mark_size);
+        corner_mark(p3, p0, p2, p1, h, r, edge_length, mark_pos, mark_size);
+      }
     }
+}
+
+// Mask to isolate the cut tips of the tetrahedron
+module dice_cut_mask(edge_length, r, cut_depth, tip_index = -1) {
+  e = edge_length - 2 * r;
+  h = e * sqrt(2 / 3);
+  centroid = [0, 0, h / 4];
+  s = edge_length * 2; // Large block
+
+  if (tip_index == -1 || tip_index == 3) {
+    // Tip 3 (Top)
+    cut3_z = (h + r) - cut_depth;
+    translate([0, 0, cut3_z]) cylinder(r=s, h=s, center=false, $fn=4);
+  }
+
+  if (tip_index == -1 || tip_index == 0) {
+    // Tip 0 (Base Right)
+    p0 = [e / sqrt(3), 0, 0];
+    N0 = (p0 - centroid) / norm(p0 - centroid);
+    cut0_pos = (p0 + N0 * r) - N0 * cut_depth;
+    rot_y = atan2(N0[0], N0[2]);
+
+    translate(cut0_pos) rotate([0, rot_y, 0]) cylinder(r=s, h=s, center=false, $fn=4);
+  }
+}
+
+// Generate only the cut-off tips of the dice, laid flat for printing
+module dice_tips(edge_length = 50, corner_radius = 5) {
+  r = max(0.001, min(corner_radius, edge_length / 2 - 0.001));
+  e = edge_length - 2 * r;
+  h = e * sqrt(2 / 3);
+  centroid = [0, 0, h / 4];
+
+  // Cut height for Tip 3
+  cut3_z = (h + r) - dice_tip_cut_depth;
+
+  // Tip 3 (Top) - Translated down so the cut face is exactly at Z=0
+  translate([-edge_length / 2, 0, 0])
+    translate([0, 0, -(cut3_z + r)])
+      intersection() {
+        rounded_tetrahedron(edge_length, corner_radius, mark_pos=0, mark_size=0, center=false, render_full=true);
+        translate([0, 0, r]) dice_cut_mask(edge_length, r, dice_tip_cut_depth, tip_index=3);
+      }
+
+  // Tip 0 (Base Right)
+  p0 = [e / sqrt(3), 0, 0];
+  N0 = (p0 - centroid) / norm(p0 - centroid);
+  cut0_pos = (p0 + N0 * r) - N0 * dice_tip_cut_depth;
+  rot_y = atan2(N0[0], N0[2]);
+
+  // Un-rotate and un-translate so the cut face is exactly at Z=0 and facing up
+  translate([edge_length / 2, 0, 0])
+    rotate([0, -rot_y, 0])
+      translate(-(cut0_pos + [0, 0, r]))
+        intersection() {
+          rounded_tetrahedron(edge_length, corner_radius, mark_pos=0, mark_size=0, center=false, render_full=true);
+          translate([0, 0, r]) dice_cut_mask(edge_length, r, dice_tip_cut_depth, tip_index=0);
+        }
 }
 
 // Helper module to place a triangular cut on a face near a corner
@@ -866,6 +934,8 @@ if (output_mode == "3D") {
   }
 } else if (output_mode == "DICE") {
   rounded_tetrahedron(edge_length=dice_edge, corner_radius=dice_corner_radius, mark_pos=dice_mark_pos, mark_size=dice_mark_size, center=false);
+} else if (output_mode == "DICE_TIPS") {
+  dice_tips(edge_length=dice_edge, corner_radius=dice_corner_radius);
 } else if (output_mode == "PIECE") {
   piece_d = sq_size * piece_ratio;
   piece_h = piece_d * piece_height_ratio;
