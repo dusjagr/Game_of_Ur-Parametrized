@@ -61,7 +61,28 @@ This model is designed to be easily customized without touching any code by usin
 ### Piece Options
 - **`piece_type`**: Toggle between `"3D"` (rounded printable pieces) and `"LASER"` (flat laser-cut circles with engraved designs).
 
+## Automated Export Script
+
+To streamline the process of generating all necessary files for laser cutting and 3D printing, a bash utility script is included: `export_assets.sh`. 
+
+This script reads your saved configurations from `ur_laser_box.json` and uses the OpenSCAD command-line interface to automatically generate a complete asset pack.
+
+> [!NOTE]
+> This bash script is designed to run natively on **Linux**. It relies on `bash 4.0+` and assumes `openscad` and `python3` are available in your system PATH. macOS/Windows users may need to run it via a newer bash environment (like WSL or Homebrew) and configure aliases for OpenSCAD.
+
+**Usage:**
+1. Save your preferred configuration in the OpenSCAD Customizer as a new preset.
+2. Run the script: `./export_assets.sh`
+3. The script will present a numbered menu of your saved presets. Select one, and it will automatically generate an `exports/<preset_name>/` folder containing:
+   - `box_layout.svg` and `engravings.svg` (Raw OpenSCAD output paths)
+   - `combined_laser_file.svg` (A layered master SVG combining cuts in red and engravings in black, with perfectly aligned dimensions—ideal for direct import into LightBurn)
+   - `pieces.stl` (3D printable playing pieces)
+   - `dice_standard.stl`, `dice_cut_base.stl`, `dice_cut_tips.stl` (All three variations of the tetrahedral dice)
+
 ## History of the Game
+
+![Original Game of Ur at the British Museum](img/britishM_collection_game_of_ur.png)
+
 
 The Royal Game of Ur is an ancient Mesopotamian board game played from the early third millennium BC (c. 2600-2400 BC). It is a two-player race game played with sets of seven markers and four tetrahedral dice. The game was famously rediscovered by English archaeologist Sir Leonard Woolley during his excavations of the Royal Cemetery at Ur between 1922 and 1934, making it one of the oldest known board games in human history. 
 
@@ -92,7 +113,7 @@ This codebase was developed iteratively from scratch through rapid pair-programm
 - The AI dynamically calculated angles and lengths to generate perfectly interlocking finger joints, replacing the static `.dxf` structural walls of the original inspiration.
 - Migrated all graphical engravings from non-manifold `.dxf` open paths to pristine, closed `.svg` imports for drastically improved rendering stability.
 - **AI Model**: Gemini 3.1 Pro (via Antigravity agent)
-- **Estimated AI Compute Usage**: ~400,000 Input Tokens, ~25,000 Output Tokens.
+- **Estimated AI Compute Usage**: ~950,000 Input Tokens, ~45,000 Output Tokens.
 
 ## License
 This project is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) License.
